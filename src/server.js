@@ -1,5 +1,6 @@
 import express, { json } from "express";
 import { getConnection } from "./database.js";
+import { User } from "./models/User.js";
 
 const app = express();
 
@@ -15,9 +16,8 @@ app.get("/", (req, res) => {
 
 // Obtener todos los usuarios
 app.get("/api/users", async (req, res) => {
-   const connection = await getConnection();
-   const [rows] = await connection.execute("SELECT * FROM `users`");
-   res.send(rows);
+   const users = await User.getAll();
+   res.status(200).json(users);
 });
 
 // Obtener los usuarios por nombre
@@ -32,30 +32,20 @@ app.get("/api/users/search", (req, res) => {
 app.get("/api/users/:id", async (req, res) => {
    const id = req.params.id; // params -> id
 
-   const connection = await getConnection();
-   const [rows] = await connection.execute(
-      "SELECT * FROM `users` WHERE `id` = ?",
-      [id]
-   );
+   const user = await User.getById(id);
 
-   console.log(req.params);
-   res.json(rows[0]);
+   res.status(200).json(user);
 });
 
 // Crear un usuario
 app.post("/api/users", async (req, res) => {
-   const connection = await getConnection();
+   const data = req.body;
 
-   const { username, first_name, last_name, email } = req.body;
-
-   const [result] = await connection.execute(
-      "INSERT INTO users (username, first_name, last_name, email) VALUES (?, ?, ?, ?)",
-      [username, first_name, last_name, email]
-   );
+   const result = await User.create(data);
 
    res.status(201).json({
       message: "User successfully created",
-      id: result.insertId,
+      id: result,
    });
 });
 
