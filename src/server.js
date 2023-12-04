@@ -1,6 +1,7 @@
 import express, { json } from "express";
 import { getConnection } from "./database.js";
 import { User } from "./models/User.js";
+import { UserController } from "./controllers/UserController.js";
 
 const app = express();
 
@@ -15,10 +16,7 @@ app.get("/", (req, res) => {
 });
 
 // Obtener todos los usuarios
-app.get("/api/users", async (req, res) => {
-   const users = await User.getAll();
-   res.status(200).json(users);
-});
+app.get("/api/users", UserController.getAll);
 
 // Obtener los usuarios por nombre
 app.get("/api/users/search", (req, res) => {
