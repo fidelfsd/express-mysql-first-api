@@ -42,11 +42,24 @@ export class User {
 
    static async update(id, data) {
       await this.initConnection();
-      //
+
+      const { username, first_name, last_name, email } = data;
+
+      const [result] = await User.#connection.execute(
+         "UPDATE users SET username=?, first_name=?, last_name=?, email=? WHERE id=?",
+         [username, first_name, last_name, email, id]
+      );
+
+      return result.affectedRows;
    }
 
    static async delete(id) {
       await this.initConnection();
-      //
+
+      const [result] = await User.#connection.execute(
+         "DELETE FROM users WHERE id = ?",
+         [id]
+      );
+      return result.affectedRows;
    }
 }
